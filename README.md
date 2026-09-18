@@ -1,13 +1,15 @@
 # expr4k
 
-A small, safe, **typed expression language** for the JVM, written in Kotlin.
+A small, safe, **typed expression language** for the JVM and the browser, written in Kotlin
+Multiplatform.
 
 Evaluate expressions like `age >= 18 && country in ["UK", "IE"]` against a context — with **no code
 injection**, type errors caught *before* evaluation, and clear messages that point at the source.
 
 > **Status: working, pre-release.** The full pipeline is in with a public `Expr` API — lexer,
-> parser, static type checker and tree-walking evaluator, all tested, with a REPL/CLI. A web
-> playground is next. Not yet published to Maven Central.
+> parser, static type checker and tree-walking evaluator, all tested, with a REPL/CLI. The same code
+> compiles to JVM and JS (Kotlin Multiplatform); a browser playground is next. Not yet published to
+> Maven Central.
 
 ## Why
 
@@ -40,15 +42,14 @@ threads.
 A small REPL and one-shot evaluator ship alongside the library:
 
 ```bash
-./gradlew installDist
-./build/install/expr4k/bin/expr4k "2 + 3 * 4"    # one-shot → 14.0
+./gradlew runCli --args="2 + 3 * 4"    # one-shot → 14.0
 
-./build/install/expr4k/bin/expr4k                # REPL
+./gradlew runCli                       # REPL
 > :let age 21
 age = 21.0 : number
 > age >= 18 && age < 65
 true : boolean
-> :help                                          # :let, :type, :vars, :quit
+> :help                                # :let, :type, :vars, :quit
 ```
 
 ## Design

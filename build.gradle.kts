@@ -1,47 +1,58 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    `java-library`
+    alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
-    application
 }
 
 group = "com.digitalbluebird"
 version = "0.1.0-SNAPSHOT"
-
-// A small REPL / one-shot CLI ships alongside the library. Extract into a separate :cli module before
-// publishing if the library artifact should stay free of the entry point.
-application {
-    mainClass = "com.digitalbluebird.expr4k.cli.MainKt"
-}
 
 repositories {
     mavenCentral()
 }
 
 kotlin {
-    jvmToolchain(21)
     explicitApi()
-    compilerOptions {
-        freeCompilerArgs.add("-Xjsr305=strict")
+    jvmToolchain(21)
+
+    jvm()
+
+    js {
+        nodejs()
+        // The browser target and executable bundle for the web playground are added in a later slice.
+    }
+
+    sourceSets {
+        // The library (commonMain) is pure Kotlin stdlib, so it compiles to every target.
+        jvmTest.dependencies {
+            implementation(kotlin("test-junit5"))
+            implementation(libs.assertk)
+        }
     }
 }
 
-dependencies {
-    testImplementation(platform(libs.junit.bom))
-    testImplementation(libs.junit.jupiter)
-    testImplementation(kotlin("test-junit5"))
-    testImplementation(libs.assertk)
-    testRuntimeOnly(libs.junit.platform.launcher)
-}
-
-tasks.test {
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-// Run the indicative microbenchmark: ./gradlew benchmark
+// The CLI and benchmark are JVM-only; run them off the JVM compilations directly.
+val jvmMainOutput = kotlin.jvm().compilations.getByName("main")
+val jvmTestOutput = kotlin.jvm().compilations.getByName("test")
+
+tasks.register<JavaExec>("runCli") {
+    group = "application"
+    description = "Run the expr4k REPL/CLI (add --args=\"<expression>\" for one-shot mode)."
+    classpath = files(jvmMainOutput.output.allOutputs, jvmMainOutput.runtimeDependencyFiles)
+    mainClass.set("com.digitalbluebird.expr4k.cli.MainKt")
+    standardInput = System.`in`
+}
+
 tasks.register<JavaExec>("benchmark") {
     group = "verification"
     description = "Run the indicative expr4k microbenchmark."
-    classpath = sourceSets["test"].runtimeClasspath
+    classpath = files(
+        jvmTestOutput.output.allOutputs,
+        jvmMainOutput.output.allOutputs,
+        jvmTestOutput.runtimeDependencyFiles,
+    )
     mainClass.set("com.digitalbluebird.expr4k.benchmark.BenchmarkKt")
 }
