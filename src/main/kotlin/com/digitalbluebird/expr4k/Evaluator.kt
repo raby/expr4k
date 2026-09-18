@@ -80,12 +80,12 @@ public class Evaluator(private val context: Map<String, Any?> = emptyMap()) {
 
     private fun evalLogical(node: Binary): Boolean {
         val left = eval(node.left)
-        if (left !is Boolean) typeError("operator '${symbol(node.op)}'", "a boolean", left, node.left.pos)
+        if (left !is Boolean) typeError("operator '${node.op.symbol}'", "a boolean", left, node.left.pos)
         // short-circuit: don't touch the right side when the left already decides the result
         if (node.op == BinaryOp.AND && !left) return false
         if (node.op == BinaryOp.OR && left) return true
         val right = eval(node.right)
-        if (right !is Boolean) typeError("operator '${symbol(node.op)}'", "a boolean", right, node.right.pos)
+        if (right !is Boolean) typeError("operator '${node.op.symbol}'", "a boolean", right, node.right.pos)
         return right
     }
 
@@ -96,7 +96,7 @@ public class Evaluator(private val context: Map<String, Any?> = emptyMap()) {
             left is Double && right is Double -> left.compareTo(right)
             left is String && right is String -> left.compareTo(right)
             else -> throw EvalException(
-                "operator '${symbol(node.op)}' expects two numbers or two strings but got " +
+                "operator '${node.op.symbol}' expects two numbers or two strings but got " +
                     "${typeName(left)} and ${typeName(right)}",
                 node.pos,
             )
@@ -137,9 +137,9 @@ public class Evaluator(private val context: Map<String, Any?> = emptyMap()) {
 
     private fun evalArithmetic(node: Binary): Double {
         val left = eval(node.left)
-        if (left !is Double) typeError("operator '${symbol(node.op)}'", "two numbers", left, node.left.pos)
+        if (left !is Double) typeError("operator '${node.op.symbol}'", "two numbers", left, node.left.pos)
         val right = eval(node.right)
-        if (right !is Double) typeError("operator '${symbol(node.op)}'", "two numbers", right, node.right.pos)
+        if (right !is Double) typeError("operator '${node.op.symbol}'", "two numbers", right, node.right.pos)
         return when (node.op) {
             BinaryOp.SUB -> left - right
             BinaryOp.MUL -> left * right
@@ -168,23 +168,6 @@ public class Evaluator(private val context: Map<String, Any?> = emptyMap()) {
             is List<*> -> "list"
             is Map<*, *> -> "object"
             else -> value::class.simpleName ?: "value"
-        }
-
-        fun symbol(op: BinaryOp): String = when (op) {
-            BinaryOp.OR -> "||"
-            BinaryOp.AND -> "&&"
-            BinaryOp.EQ -> "=="
-            BinaryOp.NEQ -> "!="
-            BinaryOp.LT -> "<"
-            BinaryOp.LTE -> "<="
-            BinaryOp.GT -> ">"
-            BinaryOp.GTE -> ">="
-            BinaryOp.IN -> "in"
-            BinaryOp.ADD -> "+"
-            BinaryOp.SUB -> "-"
-            BinaryOp.MUL -> "*"
-            BinaryOp.DIV -> "/"
-            BinaryOp.MOD -> "%"
         }
 
         fun typeError(operator: String, expected: String, got: Any?, pos: Pos): Nothing =

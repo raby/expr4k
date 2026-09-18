@@ -49,12 +49,23 @@ public data class Ternary(
 /** The prefix unary operators. */
 public enum class UnaryOp { NOT, NEG }
 
-/** The binary operators, grouped loosest-binding first for readability (precedence lives in [Parser]). */
-public enum class BinaryOp {
-    OR, AND,
-    EQ, NEQ,
-    LT, LTE, GT, GTE,
-    IN,
-    ADD, SUB,
-    MUL, DIV, MOD,
+/**
+ * The binary operators, grouped loosest-binding first for readability (precedence lives in [Parser]).
+ * Each carries its source [symbol] for error messages, shared by the evaluator and type checker.
+ */
+public enum class BinaryOp(internal val symbol: String) {
+    OR("||"),
+    AND("&&"),
+    EQ("=="),
+    NEQ("!="),
+    LT("<"),
+    LTE("<="),
+    GT(">"),
+    GTE(">="),
+    IN("in"),
+    ADD("+"),
+    SUB("-"),
+    MUL("*"),
+    DIV("/"),
+    MOD("%"),
 }
