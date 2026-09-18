@@ -1,7 +1,7 @@
 package com.digitalbluebird.expr4k
 
 /** Raised when the type checker finds a static type error. Carries the [pos] of the offending node. */
-public class TypeException(message: String, public val pos: Pos) : Exception("$message at $pos")
+public class TypeException(message: String, pos: Pos) : Expr4kException(message, pos)
 
 /**
  * The static type of an expression's value.

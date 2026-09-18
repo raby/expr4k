@@ -1,7 +1,18 @@
 package com.digitalbluebird.expr4k
 
 /** Raised when a well-formed tree cannot be evaluated: a type mismatch, an undefined name, and such. */
-public class EvalException(message: String, public val pos: Pos) : Exception("$message at $pos")
+public class EvalException(message: String, pos: Pos) : Expr4kException(message, pos)
+
+/** The expr4k type name of a runtime [value], for error messages. Shared across the evaluator and facade. */
+internal fun typeName(value: Any?): String = when (value) {
+    null -> "null"
+    is Double -> "number"
+    is String -> "string"
+    is Boolean -> "boolean"
+    is List<*> -> "list"
+    is Map<*, *> -> "object"
+    else -> value::class.simpleName ?: "value"
+}
 
 /**
  * Evaluates a [Node] tree against a [context] of variable bindings.
@@ -158,16 +169,6 @@ public class Evaluator(private val context: Map<String, Any?> = emptyMap()) {
             is List<*> -> value.map { normalize(it) }
             is Map<*, *> -> value.entries.associate { (k, v) -> k.toString() to normalize(v) }
             else -> value
-        }
-
-        fun typeName(value: Any?): String = when (value) {
-            null -> "null"
-            is Double -> "number"
-            is String -> "string"
-            is Boolean -> "boolean"
-            is List<*> -> "list"
-            is Map<*, *> -> "object"
-            else -> value::class.simpleName ?: "value"
         }
 
         fun typeError(operator: String, expected: String, got: Any?, pos: Pos): Nothing =

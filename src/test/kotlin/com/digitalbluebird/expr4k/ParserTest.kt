@@ -137,4 +137,15 @@ class ParserTest {
         val e = assertFailsWith<ParseException> { parse("") }
         assertThat(e.message!!).contains("end of input")
     }
+
+    @Test
+    fun `caps deeply nested groups rather than overflowing the stack`() {
+        val e = assertFailsWith<ParseException> { parse("(".repeat(5000)) }
+        assertThat(e.message!!).contains("too deeply")
+    }
+
+    @Test
+    fun `caps deeply nested prefix operators`() {
+        assertFailsWith<ParseException> { parse("!".repeat(5000) + "x") }
+    }
 }

@@ -1,7 +1,7 @@
 package com.digitalbluebird.expr4k
 
 /** Raised when the source cannot be tokenised. Carries the [pos] of the offending character. */
-public class LexException(message: String, public val pos: Pos) : Exception("$message at $pos")
+public class LexException(message: String, pos: Pos) : Expr4kException(message, pos)
 
 /**
  * Turns an expression [source] string into a flat list of [Token]s, always ending with an

@@ -1,7 +1,7 @@
 package com.digitalbluebird.expr4k
 
 /** Raised when tokens cannot be parsed into a syntax tree. Carries the [pos] of the offending token. */
-public class ParseException(message: String, public val pos: Pos) : Exception("$message at $pos")
+public class ParseException(message: String, pos: Pos) : Expr4kException(message, pos)
 
 /**
  * Parses a flat [tokens] list (as produced by [Lexer]) into a [Node] tree.
@@ -23,8 +23,9 @@ public class ParseException(message: String, public val pos: Pos) : Exception("$
  * primary        literals, names, ( ), [ ]
  * ```
  */
-public class Parser(private val tokens: List<Token>) {
+public class Parser(private val tokens: List<Token>, private val maxDepth: Int = MAX_DEPTH) {
     private var current = 0
+    private var depth = 0
 
     /** Parse the tokens into a single expression tree, or throw [ParseException]. */
     public fun parse(): Node {
@@ -33,7 +34,21 @@ public class Parser(private val tokens: List<Token>) {
         return node
     }
 
-    private fun expression(): Node = ternary()
+    /**
+     * Run [body] one recursion level deeper, capping nesting at [maxDepth] so untrusted input cannot
+     * overflow the stack. Wraps the two unbounded recursion points: [expression] (grouping, list
+     * elements, ternary branches) and prefix [unary] chains.
+     */
+    private inline fun <T> nested(body: () -> T): T {
+        if (++depth > maxDepth) throw error(peek(), "Expression nested too deeply (limit $maxDepth)")
+        try {
+            return body()
+        } finally {
+            depth--
+        }
+    }
+
+    private fun expression(): Node = nested { ternary() }
 
     private fun ternary(): Node {
         val condition = or()
@@ -78,7 +93,7 @@ public class Parser(private val tokens: List<Token>) {
         if (match(TokenType.NOT, TokenType.MINUS)) {
             val opToken = previous()
             val op = if (opToken.type == TokenType.NOT) UnaryOp.NOT else UnaryOp.NEG
-            return Unary(op, unary(), opToken.pos)
+            return nested { Unary(op, unary(), opToken.pos) }
         }
         return postfix()
     }
@@ -159,6 +174,9 @@ public class Parser(private val tokens: List<Token>) {
         if (token.type == TokenType.EOF) "end of input" else "'${token.lexeme}'"
 
     private companion object {
+        /** Nesting cap: deep enough for any hand-written expression, shallow enough to never overflow. */
+        const val MAX_DEPTH = 200
+
         /** Map an operator token kind to its [BinaryOp]. Only ever called on a matched operator token. */
         fun binaryOp(type: TokenType): BinaryOp = when (type) {
             TokenType.OR -> BinaryOp.OR
