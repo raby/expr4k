@@ -7,3 +7,4 @@ assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "assert
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+maven-publish = { id = "com.vanniktech.maven.publish", version = "0.30.0" }

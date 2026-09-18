@@ -1,6 +1,8 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    `maven-publish`
+    alias(libs.plugins.maven.publish)
 }
 
 group = "com.digitalbluebird"
@@ -8,6 +10,41 @@ version = "0.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+// Maven Central (Central Portal) publishing. The config is ready; the publish itself is user-driven:
+// it needs a Sonatype Central account with the com.digitalbluebird namespace verified, a GPG signing
+// key, and credentials (mavenCentralUsername / mavenCentralPassword and signing.* in
+// ~/.gradle/gradle.properties or env vars). Central Portal takes releases only, so bump off -SNAPSHOT
+// first. See PUBLISHING.md. Signing runs only on publish tasks, so `./gradlew build` needs no keys.
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+    coordinates(group.toString(), "expr4k", version.toString())
+    pom {
+        name.set("expr4k")
+        description.set("A small, safe, typed expression language for the JVM and the browser.")
+        url.set("https://github.com/raby/expr4k")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://opensource.org/licenses/MIT")
+                distribution.set("repo")
+            }
+        }
+        developers {
+            developer {
+                id.set("raby")
+                name.set("Raby Whyte")
+                url.set("https://digitalbluebird.com")
+            }
+        }
+        scm {
+            url.set("https://github.com/raby/expr4k")
+            connection.set("scm:git:https://github.com/raby/expr4k.git")
+            developerConnection.set("scm:git:ssh://git@github.com/raby/expr4k.git")
+        }
+    }
 }
 
 kotlin {
