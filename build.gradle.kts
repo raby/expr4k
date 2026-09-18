@@ -17,8 +17,9 @@ kotlin {
     jvm()
 
     js {
-        nodejs()
-        // The browser target and executable bundle for the web playground are added in a later slice.
+        moduleName = "expr4k"
+        browser()
+        binaries.executable() // webpack a browser bundle exposing the @JsExport playground API
     }
 
     sourceSets {
