@@ -6,6 +6,8 @@ All notable changes to expr4k are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-19
+
 ### Added
 
 - Hand-written lexer with source positions and clear tokenisation errors.
@@ -22,4 +24,5 @@ All notable changes to expr4k are recorded here. The format follows
 - GitHub Actions CI (build + test), and a JMH microbenchmark (in the `:benchmark` module).
 - Maven Central (Central Portal) publishing configuration — see [PUBLISHING.md](PUBLISHING.md).
 
-[Unreleased]: https://github.com/raby/expr4k/commits/main
+[Unreleased]: https://github.com/raby/expr4k/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/raby/expr4k/releases/tag/v0.1.0
