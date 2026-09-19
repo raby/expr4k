@@ -19,7 +19,7 @@ All notable changes to expr4k are recorded here. The format follows
 - A REPL and one-shot CLI.
 - Kotlin Multiplatform: the same library compiles to the JVM and to JavaScript (a ~64KB browser
   bundle with a JSON-in / JSON-out `evaluate` entry point).
-- GitHub Actions CI (build + test), and an indicative microbenchmark.
+- GitHub Actions CI (build + test), and a JMH microbenchmark (in the `:benchmark` module).
 - Maven Central (Central Portal) publishing configuration — see [PUBLISHING.md](PUBLISHING.md).
 
 [Unreleased]: https://github.com/raby/expr4k/commits/main

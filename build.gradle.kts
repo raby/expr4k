@@ -72,9 +72,8 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
-// The CLI and benchmark are JVM-only; run them off the JVM compilations directly.
+// The CLI is JVM-only; run it off the JVM main compilation directly. (JMH benchmarks live in :benchmark.)
 val jvmMainOutput = kotlin.jvm().compilations.getByName("main")
-val jvmTestOutput = kotlin.jvm().compilations.getByName("test")
 
 tasks.register<JavaExec>("runCli") {
     group = "application"
@@ -82,15 +81,4 @@ tasks.register<JavaExec>("runCli") {
     classpath = files(jvmMainOutput.output.allOutputs, jvmMainOutput.runtimeDependencyFiles)
     mainClass.set("com.digitalbluebird.expr4k.cli.MainKt")
     standardInput = System.`in`
-}
-
-tasks.register<JavaExec>("benchmark") {
-    group = "verification"
-    description = "Run the indicative expr4k microbenchmark."
-    classpath = files(
-        jvmTestOutput.output.allOutputs,
-        jvmMainOutput.output.allOutputs,
-        jvmTestOutput.runtimeDependencyFiles,
-    )
-    mainClass.set("com.digitalbluebird.expr4k.benchmark.BenchmarkKt")
 }

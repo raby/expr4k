@@ -8,8 +8,8 @@ injection**, type errors caught *before* evaluation, and clear messages that poi
 
 > **Status: working, pre-release.** The full pipeline is in with a public `Expr` API — lexer,
 > parser, static type checker and tree-walking evaluator, all tested, with a REPL/CLI. The same code
-> compiles to JVM and JS (Kotlin Multiplatform); a browser playground is next. Not yet published to
-> Maven Central.
+> compiles to JVM and JS (Kotlin Multiplatform), and a browser playground runs the library compiled to
+> JS. Not yet published to Maven Central.
 
 ## Why
 
@@ -57,22 +57,22 @@ true : boolean
 A hand-written pipeline, no parser generator — owning the parser is the point:
 
 ```
-source ──▶ Lexer ──▶ tokens ──▶ Pratt parser ──▶ typed AST ──▶ type check ──▶ evaluator ──▶ value
+source ──▶ Lexer ──▶ tokens ──▶ parser ──▶ typed AST ──▶ type check ──▶ evaluator ──▶ value
 ```
 
 ## Benchmark
 
-`./gradlew benchmark` runs an indicative harness (JIT warmup, best of five rounds, results kept live
-to defeat dead-code elimination). Compiling a predicate once and reusing it is far cheaper than
-re-parsing on every evaluation:
+`./gradlew :benchmark:jmh` runs the [JMH](https://github.com/openjdk/jmh) microbenchmarks (in the
+`:benchmark` module — a small JVM module that consumes the library's JVM target). Compiling a
+predicate once and reusing it is far cheaper than re-parsing on every evaluation:
 
 | approach | ns / eval | throughput |
 | --- | ---: | ---: |
-| compile once, eval many | ~90 | ~11M / sec |
-| compile on every eval | ~1,520 | ~0.66M / sec |
+| compile once, eval many | ~95 | ~10.5M / sec |
+| compile on every eval | ~1,590 | ~0.63M / sec |
 
-So reusing a compiled `Expr` is roughly **17x faster per evaluation**. (Figures are indicative and
-machine-dependent — run it yourself.)
+So reusing a compiled `Expr` is roughly **17x faster per evaluation** (JMH average time, 2 forks × 5
+iterations). Figures are machine-dependent — run it yourself.
 
 ## Building
 

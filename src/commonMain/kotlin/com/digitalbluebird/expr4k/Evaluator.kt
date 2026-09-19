@@ -21,8 +21,9 @@ internal fun typeName(value: Any?): String = when (value) {
  * [Map] (an "object", reached by member access). Numbers arriving through the [context] are coerced
  * to [Double], so an `Int` binding compares equal to a numeric literal.
  *
- * `&&` and `||` short-circuit; `?:` evaluates only the branch it takes. Type mismatches are caught
- * here, at evaluation time; a dedicated type-checking stage comes later. Construct one per evaluation.
+ * `&&` and `||` short-circuit; `?:` evaluates only the branch it takes. Types are enforced here at
+ * evaluation time, beneath the static [TypeChecker] that catches what it can first. Construct one per
+ * evaluation.
  */
 public class Evaluator(private val context: Map<String, Any?> = emptyMap()) {
 

@@ -1,5 +1,7 @@
 rootProject.name = "expr4k"
 
+include(":benchmark")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()

@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.js.ExperimentalJsExport::class)
+
 package com.digitalbluebird.expr4k.js
 
 import com.digitalbluebird.expr4k.Expr
